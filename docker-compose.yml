@@ -1,0 +1,107 @@
+#### docker-compose
+### From https://github.com/milvus-io/milvus/releases/download/v2.6.2/milvus-standalone-docker-compose.yml
+
+### Sets up a Milvus server with Etcd and MinIO servers for support in Docker containers.
+
+### Three containers are created and communicate with each other through the `milvus` network:
+## 1. A Milvus server to handle vector database operations through port `localhost:19530`.
+##    - All data is saved in the Docker volume `milvus-data`
+##    - Data stored will be specific configuration data and logs.
+## 2. An Etcd server for coordination and storage
+##    - All data is saved in the Docker volume `etcd-data`
+##    - Data stored will be database and collection metadata, specific configuration settings, state and server info, etc.
+## 3. A MinIO server for data storage
+##    - All data will be stored in `minio-data` volume
+##    - Data stored will be all the heavy duty collection data like raw data, vector embeddings, backups, etc.
+
+
+### Creating networks
+networks: # This is where all containers can talk to each other
+  default:
+    name: milvus
+
+
+### Creating volumes
+volumes:
+  etcd-data:
+  minio-data:
+  milvus-data:
+
+
+### Creating containers
+services:
+  etcd: # Etcd container
+    container_name: milvus-etcd
+    image: quay.io/coreos/etcd:v3.6.5
+    environment:
+      - ETCD_AUTO_COMPACTION_MODE=revision  # Automatically compacts data when needed
+      - ETCD_AUTO_COMPACTION_RETENTION=1000 # Keeps the last 1000 revisions of data
+      - ETCD_QUOTA_BACKEND_BYTES=4294967296 # Sets a limit on stored data size
+      - ETCD_SNAPSHOT_COUNT=50000           # Creates snapshots after this many writes
+    volumes:  # Mount Docker volume to map to necessary Etcd data
+      - etcd-data:/etcd
+    # Starts Etcd with additional startup settings for storage and to use port 2379
+    command: etcd -advertise-client-urls=http://etcd:2379 -listen-client-urls http://0.0.0.0:2379 --data-dir /etcd
+    healthcheck:  # Periodically check Etcd server health
+      test: ["CMD", "etcdctl", "endpoint", "health"]
+      interval: 30s # Check every 30s
+      timeout: 20s  # Fail if no response for 20s
+      retries: 3    # Try three more times before marking unhealthy
+
+  minio:  # MinIO container
+    container_name: milvus-minio
+    image: minio/minio:RELEASE.2024-12-18T13-15-44Z
+    environment:
+      MINIO_ACCESS_KEY: minioadmin  # Username for storage access
+      MINIO_SECRET_KEY: minioadmin  # Password for storage access
+    ports:
+      - "9001:9001" # Port used for web UI
+      - "9000:9000" # Port for data storage
+    volumes:  # Mount Docker volume to map to necessary MinIO data
+      - minio-data:/minio_data  
+      # Added extra volume here to prevent default Docker volume addition
+      - minio-data:/data  
+    # MinIO startup command with custom web UI settings
+    command: minio server /minio_data --console-address ":9001" 
+    healthcheck:  # Periodically check MinIO server health
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 30s 
+      timeout: 20s  
+      retries: 3   
+
+  standalone: # Milvus Standalone container
+    container_name: milvus-standalone
+    image: milvusdb/milvus:v2.6.2
+    # Run Milvus Standalone startup command
+    command: ["milvus", "run", "standalone"]
+    # Seems Milvus needs more lax security restrictions to work properly
+    security_opt:
+    - seccomp:unconfined
+    environment:
+      ETCD_ENDPOINTS: etcd:2379 # Point to Etcd server
+      MINIO_ADDRESS: minio:9000 # Point to MinIO server data storage port
+      # Set message queue type to use Woodpecker
+      MQ_TYPE: woodpecker       
+    volumes:  # Mount Docker volume to map to necessary Milvus data
+      - milvus-data:/var/lib/milvus
+    healthcheck:  # Periodically check Milvus server health
+      test: ["CMD", "curl", "-f", "http://localhost:9091/healthz"]
+      interval: 30s     
+      start_period: 90s # Wait 90s before starting first check
+      timeout: 20s      
+      retries: 3        
+    ports:  # Allow external processes to access Milvus server here
+      - "19530:19530" # Port for Milvus client API
+      - "9091:9091"   # Port used for health check and web UI
+    # Make sure Etcd and MinIO servers are working before starting Milvus server
+    depends_on:
+      - "etcd"
+      - "minio"
+
+
+### Lauren Street | 2025/09/23
+## Modifications compared to original | https://github.com/milvus-io/milvus/releases/download/v2.6.2/milvus-standalone-docker-compose.yml
+# 1. Removed deprecated version argument
+# 2. Added Docker volumes instead of using local folders
+# 3. Added lots of comments and attribution
+# 4. Updated etcd version

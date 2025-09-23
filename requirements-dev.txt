@@ -1,0 +1,8 @@
+mypy
+
+pytest
+pytest-order
+
+coverage
+
+faker
