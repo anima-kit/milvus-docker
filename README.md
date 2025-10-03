@@ -1,11 +1,11 @@
 ![GitHub Workflow Status](https://github.com/anima-kit/milvus-docker/actions/workflows/ci.yml/badge.svg?branch=main) [![codecov](https://codecov.io/gh/anima-kit/milvus-docker/graph/badge.svg)](https://codecov.io/gh/anima-kit/milvus-docker)
 
-# <img src="assets/milvus.svg" alt="Milvus" style="width: 32px; height: 32px; vertical-align: middle;"> <img src="assets/docker.svg" alt="Docker" style="width: 32px; height: 32px; vertical-align: middle;"> <img src="assets/python.svg" alt="Python" style="width: 32px; height: 32px; vertical-align: middle;">  Milvus Docker with Python
+# <img src="https://anima-kit.github.io/milvus-docker/assets/milvus.svg" alt="Milvus" style="width: 32px; height: 32px; vertical-align: middle;"> <img src="https://anima-kit.github.io/milvus-docker/assets/docker.svg" alt="Docker" style="width: 32px; height: 32px; vertical-align: middle;"> <img src="https://anima-kit.github.io/milvus-docker/assets/python.svg" alt="Python" style="width: 32px; height: 32px; vertical-align: middle;">  Milvus Docker with Python
 
-![image](assets/milvus-docker-python.png)
+![image](https://anima-kit.github.io/milvus-docker/assets/milvus-docker-python.png)
 
 <p align="center">
-  <img src="assets/milvus-docker-intro.gif" alt="animated" />
+  <img src="https://anima-kit.github.io/milvus-docker/assets/milvus-docker-intro.gif" alt="animated" />
 </p>
 
 ## 🔖 About This Project 
