@@ -1,5 +1,9 @@
 ![GitHub Workflow Status](https://github.com/anima-kit/milvus-docker/actions/workflows/ci.yml/badge.svg?branch=main) [![codecov](https://codecov.io/gh/anima-kit/milvus-docker/graph/badge.svg)](https://codecov.io/gh/anima-kit/milvus-docker)
 
+This project was a way for me to learn how to create and utilize containers in Docker for building AI systems. There's no roadmap for future features, and won't be maintained.
+
+You can [checkout tutorials here][tutorials] for concepts pertaining to building AI systems.
+
 # <img src="https://anima-kit.github.io/milvus-docker/assets/milvus.svg" alt="Milvus" style="width: 32px; height: 32px; vertical-align: middle;"> <img src="https://anima-kit.github.io/milvus-docker/assets/docker.svg" alt="Docker" style="width: 32px; height: 32px; vertical-align: middle;"> <img src="https://anima-kit.github.io/milvus-docker/assets/python.svg" alt="Python" style="width: 32px; height: 32px; vertical-align: middle;">  Milvus Docker with Python
 
 ![image](https://anima-kit.github.io/milvus-docker/assets/milvus-docker-python.png)
